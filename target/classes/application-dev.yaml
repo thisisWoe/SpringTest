@@ -1,0 +1,58 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/spring_test
+    username: dev_user
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+  #      ddl-auto: update
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 964117688934-o41ddd9emke26o4vf0lpubgfo5bec0mj.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - profile
+              - email
+            client-name: Google
+          github:
+            client-id: Ov23li5VDdE4MI0didrd
+            client-secret: 6188ae379594c059f92f3492430d85807e3b310e
+            scope:
+              - read:user
+              - user:email
+            client-name: GitHub
+            redirect-uri: "{baseUrl}/login/oauth2/code/github"
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://www.googleapis.com/oauth2/v4/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id
+
+server:
+  port: 8080
+
+app:
+  superadmin:
+    full-name: "Super Admin"
+    username: "superadmin"
+    email: "a.rondolini.dev@gmail.com"
+    password: "admin"
+    roles:
+      - "ADMIN"
+      - "CUSTOMER"
+jwt:
+  secret: "UXVlc3RhIMOoIGxhIG1pYSBzZWNyZXQgc3VwZXIgc2VncmV0YSBlIGRldmUgYW5jaGUgZXNzZXJlIHN1cGVyIGx1bmdh"
+  token-expiration-millis: 86400000 # 1 day
