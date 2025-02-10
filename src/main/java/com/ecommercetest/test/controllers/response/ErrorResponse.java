@@ -1,14 +1,19 @@
 package com.ecommercetest.test.controllers.response;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-public class CustomExceptionHandler implements ApiResponse {
+@Setter
+@Builder
+public class ErrorResponse {
+    private int status;
+    private String statusCodeExplanation;
+    private String message;
 
-    private final String statusCodeExplanation;
-    private final String message;
-
-    public CustomExceptionHandler(String statusCodeExplanation, String message) {
+    public ErrorResponse(int status, String statusCodeExplanation, String message) {
+        this.status = status;
         this.statusCodeExplanation = statusCodeExplanation;
         this.message = message;
     }
@@ -27,5 +32,11 @@ public class CustomExceptionHandler implements ApiResponse {
             case 500 -> "An unexpected error occurred on the server. Please try again later or contact support.";
             default -> "The request was processed successfully.";
         };
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[Exception] Status: %d, Explanation: %s, Message: %s",
+                status, statusCodeExplanation, message);
     }
 }
