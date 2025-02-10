@@ -14,5 +14,7 @@ public class ApplicationRunner implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         applicationStartupService.startApplication();
+        applicationStartupService.writeProjectStructure();
     }
+
 }

@@ -1,0 +1,95 @@
+    └── SpringTest
+        LICENSE
+        mvnw.cmd
+        pom.xml
+        HELP.md
+        project_structure.txt
+        .gitignore
+        .gitattributes
+        mvnw
+        test.iml
+    └── src
+        └── test
+            └── java
+                └── com
+                    └── ecommercetest
+                        └── test
+                                TestApplicationTests.java
+        └── main
+            └── resources
+                    application-prod.yaml
+                    application-dev.yaml
+                └── static
+                └── templates
+            └── java
+                └── com
+                    └── ecommercetest
+                        └── test
+                            └── config
+                                    UserConfiguration.java
+                                    RoleConfiguration.java
+                                    ProviderConfiguration.java
+                            └── security
+                                └── config
+                                        SecurityConfig.java
+                                └── oauth2
+                                        OAuth2AuthenticationSuccessHandler.java
+                                └── model
+                                    └── jwt
+                                            JwtAuthenticationFilter.java
+                                            JwtTokenProvider.java
+                                    └── logger
+                                            RequestLoggingFilter.java
+                                        SecurityUser.java
+                                        GithubUserInfo.java
+                                        GoogleUserInfo.java
+                                └── service
+                                        SecurityUserService.java
+                                        OAuth2UserService.java
+                                TestApplication.java
+                            └── runner
+                                    ApplicationRunner.java
+                            └── repositories
+                                    RoleRepository.java
+                                    UserRepository.java
+                                    ProviderRepository.java
+                            └── environment
+                                    ActiveProfiles.java
+                            └── controllers
+                                └── dto
+                                    └── sign_in
+                                            SignInRequest.java
+                                            SignInResponse.java
+                                    └── edit_user
+                                            EditUserResponse.java
+                                            EditUserRequest.java
+                                    └── sign_up
+                                            SignUpRequest.java
+                                            SignUpResponse.java
+                                └── response
+                                        ApiResponse.java
+                                        ErrorResponse.java
+                                        UserMinimized.java
+                                    TestController.java
+                                └── exception
+                                        GlobalExceptionHandler.java
+                                    UserController.java
+                            └── domain
+                                └── role
+                                        Role.java
+                                └── provider
+                                        Provider.java
+                                └── user
+                                    └── superadmin
+                                            SuperAdminProperties.java
+                                        User.java
+                            └── services
+                                    UserService.java
+                                    ProviderService.java
+                                    RoleService.java
+                                └── implementations
+                                        ApplicationStartupServiceImpl.java
+                                        ProviderServiceImpl.java
+                                        RoleServiceImpl.java
+                                        UserServiceImpl.java
+                                    ApplicationStartupService.java
