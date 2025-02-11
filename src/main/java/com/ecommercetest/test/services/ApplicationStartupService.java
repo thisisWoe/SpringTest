@@ -12,4 +12,6 @@ public interface ApplicationStartupService {
     void startApplication();
 
     void writeProjectStructure() throws IOException;
+
+    void createDevices();
 }

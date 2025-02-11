@@ -53,6 +53,7 @@
                             └── runner
                                     ApplicationRunner.java
                             └── repositories
+                                    DeviceRepository.java
                                     RoleRepository.java
                                     UserRepository.java
                                     ProviderRepository.java
@@ -63,6 +64,10 @@
                                     └── sign_in
                                             SignInRequest.java
                                             SignInResponse.java
+                                    └── device
+                                            DevicePagedListResponse.java
+                                            DeviceAssignedResponse.java
+                                            DeviceAssignRequest.java
                                     └── edit_user
                                             ChangePasswordRequest.java
                                             EditUserResponse.java
@@ -71,11 +76,11 @@
                                     └── sign_up
                                             SignUpRequest.java
                                             SignUpResponse.java
+                                    DeviceController.java
                                 └── response
                                         ApiResponse.java
                                         ErrorResponse.java
                                         UserMinimized.java
-                                    TestController.java
                                 └── exception
                                         GlobalExceptionHandler.java
                                     UserController.java
@@ -90,13 +95,19 @@
                                         User.java
                                 └── value_object
                                         EmailValueObject.java
+                                └── device
+                                        DeviceType.java
+                                        DeviceState.java
+                                        Device.java
                             └── services
+                                    DeviceService.java
                                     UserService.java
                                     ProviderService.java
                                     RoleService.java
                                 └── implementations
                                         ApplicationStartupServiceImpl.java
                                         ProviderServiceImpl.java
+                                        DeviceServiceImpl.java
                                         RoleServiceImpl.java
                                         UserServiceImpl.java
                                     ApplicationStartupService.java

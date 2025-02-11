@@ -1,11 +1,15 @@
 package com.ecommercetest.test.domain.user;
 
+import com.ecommercetest.test.domain.device.Device;
 import com.ecommercetest.test.domain.provider.Provider;
 import com.ecommercetest.test.domain.role.Role;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -50,10 +54,21 @@ public class User {
     @JoinColumn(name = "provider_id", nullable = true)
     private Provider provider;
 
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Device> devices = new ArrayList<>();
+
     public User() {
     }
 
-    public User(Long id, Set<Role> roles, String fullName, String username, String email, String password, Provider provider) {
+    public User(Long id,
+                Set<Role> roles,
+                String fullName,
+                String username,
+                String email,
+                String password,
+                Provider provider,
+                List<Device> devices) {
         this.id = id;
         this.roles = roles;
         this.fullName = fullName;
@@ -61,6 +76,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.provider = provider;
+        this.devices = devices;
     }
 
     @PrePersist

@@ -18,6 +18,7 @@ public class ApplicationRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         applicationStartupService.startApplication();
         applicationStartupService.writeProjectStructure();
+        applicationStartupService.createDevices();
     }
 
 }

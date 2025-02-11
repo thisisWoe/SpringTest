@@ -7,9 +7,12 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.nio.file.AccessDeniedException;
 
 @Slf4j
 @ControllerAdvice
@@ -59,6 +62,17 @@ public class GlobalExceptionHandler {
                 ex.getMessage());
         log.error("[" + requestId + "]" + error.toString());
         return new ResponseEntity<>(error, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AuthorizationDeniedException ex) {
+        String requestId = MDC.get("requestId");
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                ErrorResponse.switchStatusCode(HttpStatus.FORBIDDEN.value()),
+                ex.getMessage());
+        log.error("[" + requestId + "]" + error.toString());
+        return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)
