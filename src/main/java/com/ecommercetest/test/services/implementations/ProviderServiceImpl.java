@@ -10,16 +10,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ProviderServiceImpl implements ProviderService {
-    @Autowired
-    @Qualifier("googleProvider")
-    private ObjectProvider<Provider> googleProvider;
+    private final ObjectProvider<Provider> googleProvider;
 
-    @Autowired
-    @Qualifier("githubProvider")
-    private ObjectProvider<Provider> githubProvider;
+    private final ObjectProvider<Provider> githubProvider;
 
-    @Autowired
-    private ProviderRepository providerRepository;
+    private final ProviderRepository providerRepository;
+
+    public ProviderServiceImpl(@Qualifier("googleProvider") ObjectProvider<Provider> googleProvider,
+                               @Qualifier("githubProvider") ObjectProvider<Provider> githubProvider,
+                               ProviderRepository providerRepository) {
+        this.googleProvider = googleProvider;
+        this.githubProvider = githubProvider;
+        this.providerRepository = providerRepository;
+    }
 
 
     @Override

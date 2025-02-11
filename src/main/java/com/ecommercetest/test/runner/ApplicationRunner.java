@@ -8,8 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApplicationRunner implements CommandLineRunner {
 
-    @Autowired
-    private ApplicationStartupService applicationStartupService;
+    private final ApplicationStartupService applicationStartupService;
+
+    public ApplicationRunner(ApplicationStartupService applicationStartupService) {
+        this.applicationStartupService = applicationStartupService;
+    }
 
     @Override
     public void run(String... args) throws Exception {

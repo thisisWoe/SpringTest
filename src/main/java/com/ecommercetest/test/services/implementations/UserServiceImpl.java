@@ -1,6 +1,7 @@
 package com.ecommercetest.test.services.implementations;
 
 import com.ecommercetest.test.TestApplication;
+import com.ecommercetest.test.controllers.dto.edit_user.ChangePasswordRequest;
 import com.ecommercetest.test.controllers.dto.edit_user.EditUserRequest;
 import com.ecommercetest.test.controllers.dto.edit_user.EditUserResponse;
 import com.ecommercetest.test.controllers.dto.sign_in.SignInRequest;
@@ -13,6 +14,7 @@ import com.ecommercetest.test.domain.provider.Provider;
 import com.ecommercetest.test.domain.role.Role;
 import com.ecommercetest.test.domain.user.User;
 import com.ecommercetest.test.domain.user.superadmin.SuperAdminProperties;
+import com.ecommercetest.test.domain.value_object.EmailValueObject;
 import com.ecommercetest.test.environment.ActiveProfiles;
 import com.ecommercetest.test.repositories.ProviderRepository;
 import com.ecommercetest.test.repositories.RoleRepository;
@@ -53,35 +55,41 @@ import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    @Qualifier("superAdmin")
-    private ObjectProvider<User> superAdminProvider;
+    private final ObjectProvider<User> superAdminProvider;
 
-    @Autowired
-    @Qualifier("userRole")
-    private ObjectProvider<Role> customerRole;
+    private final ObjectProvider<Role> customerRole;
 
-    @Autowired
-    @Qualifier("googleProvider")
-    private ObjectProvider<Provider> googleProvider;
+    private final ObjectProvider<Provider> googleProvider;
 
-    @Autowired
-    @Qualifier("githubProvider")
-    private ObjectProvider<Provider> githubProvider;
+    private final ObjectProvider<Provider> githubProvider;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtTokenProvider jwtProvider;
+    private final JwtTokenProvider jwtProvider;
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    public UserServiceImpl(@Qualifier("superAdmin") ObjectProvider<User> superAdminProvider,
+                           @Qualifier("userRole") ObjectProvider<Role> customerRole,
+                           @Qualifier("googleProvider") ObjectProvider<Provider> googleProvider,
+                           @Qualifier("githubProvider") ObjectProvider<Provider> githubProvider,
+                           UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
+                           AuthenticationManager authenticationManager,
+                           JwtTokenProvider jwtProvider) {
+        this.superAdminProvider = superAdminProvider;
+        this.customerRole = customerRole;
+        this.googleProvider = googleProvider;
+        this.githubProvider = githubProvider;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.jwtProvider = jwtProvider;
+    }
 
     @Override
     public void checkAdminPresentOrSave() {
@@ -97,7 +105,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public SignUpResponse signUp(SignUpRequest request) {
 
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new DataIntegrityViolationException("Username already in use.");
         }
 
@@ -124,7 +132,8 @@ public class UserServiceImpl implements UserService {
             throw new EntityNotFoundException("Username not found.");
         }
 
-        User userFound = userRepository.findByUsername(request.getUsername()).orElseThrow();
+        User userFound = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("Username not found."));
 
         // Creo il token di autenticazione con username e password
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(request.getUsername(),
@@ -267,6 +276,57 @@ public class UserServiceImpl implements UserService {
                 .username(savedUser.getUsername())
                 .email(savedUser.getEmail())
                 .provider(savedUser.getProvider())
+                .build();
+    }
+
+    @Override
+    public EditUserResponse insertEmail(EmailValueObject email, Long id) {
+        if (userRepository.existsByEmail(email.getEmail())) {
+            throw new DataIntegrityViolationException("Email already in use.");
+        }
+
+        User userFound = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
+        if (!userFound.getEmail().isEmpty()) {
+            throw new DataIntegrityViolationException("User already has an email.");
+        }
+        User newUser = User.builder()
+                .id(userFound.getId())
+                .email(email.getEmail())
+                .fullName(userFound.getFullName())
+                .username(userFound.getUsername())
+                .password(userFound.getPassword())
+                .roles(userFound.getRoles())
+                .provider(userFound.getProvider())
+                .build();
+
+        userRepository.save(newUser);
+
+        return EditUserResponse.builder()
+                .id(newUser.getId())
+                .fullName(newUser.getFullName())
+                .username(newUser.getUsername())
+                .email(newUser.getEmail())
+                .provider(newUser.getProvider())
+                .build();
+    }
+
+    @Override
+    public EditUserResponse changePassword(ChangePasswordRequest request, Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found."));
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Incorrect old password.");
+        }
+
+        String newEncodedPassword = passwordEncoder.encode(request.getNewPassword());
+        user.setPassword(newEncodedPassword);
+        userRepository.save(user);
+
+        return EditUserResponse.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .provider(user.getProvider())
                 .build();
     }
 }

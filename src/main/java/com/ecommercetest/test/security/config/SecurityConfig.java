@@ -1,5 +1,7 @@
 package com.ecommercetest.test.security.config;
 
+import com.ecommercetest.test.security.model.CustomAuthenticationEntryPoint;
+import com.ecommercetest.test.security.model.RateLimiterFilter;
 import com.ecommercetest.test.security.model.jwt.JwtAuthenticationFilter;
 import com.ecommercetest.test.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,14 +22,25 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
     private final JwtAuthenticationFilter authenticationFilter;
 
-    @Autowired
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    private final RateLimiterFilter rateLimiterFilter;
+
+    public SecurityConfig(JwtAuthenticationFilter authenticationFilter,
+                          OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler,
+                          CustomAuthenticationEntryPoint customAuthenticationEntryPoint,
+                          RateLimiterFilter rateLimiterFilter) {
+        this.authenticationFilter = authenticationFilter;
+        this.oAuth2AuthenticationSuccessHandler = oAuth2AuthenticationSuccessHandler;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+        this.rateLimiterFilter = rateLimiterFilter;
+    }
 
     @Bean("passwordEncoder")
     @Scope("singleton")
@@ -68,38 +81,30 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**", "/oauth2/**")
                         .permitAll()
                         .anyRequest().authenticated())
-                // Configura il login OAuth2
+                // Configurazione login OAuth2
                 .oauth2Login(oauth2 -> oauth2
-                        // Posso impostare una pagina di login personalizzata oppure usare quella di
-                        // default
+                        // Posso impostare una pagina di login personalizzata oppure usare quella di default
                         // .loginPage("/login") // pagina custom
-                        .successHandler(oAuth2AuthenticationSuccessHandler)
                         // È possibile configurare eventuali handler per il successo o il fallimento del
                         // login OAuth2
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
                         .defaultSuccessUrl("/api/auth/oauth2/signin") // o qualsiasi endpoint dopo il login
                         .failureUrl("/login?error=true"))
                 // (Opzionale) Form login di default
                 // .formLogin(conf -> conf.);
 
+                //  definisce limiti di chiamata basati su token bucket
+                .addFilterBefore(rateLimiterFilter, UsernamePasswordAuthenticationFilter.class)
+
                 // È usato per controllare ogni richiesta che arriva, estraendo e
-                // validando un token JWT (se presente) nell’header Authorization
-                // È responsabile della creazione di un oggetto Authentication a partire dai
-                // dati inviati,
-                // che poi viene impostato nel SecurityContextHolder se la validazione ha
-                // successo
+                // validando un token JWT (se presente) nell’header Authorization.
+                // È responsabile della creazione di un oggetto Authentication a partire dai dati inviati,
+                // che poi viene impostato nel SecurityContextHolder se la validazione ha successo.
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // Configurazione AuthenticationEntryPoint
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setContentType("application/json");
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            String jsonResponse = String.format(
-                                    "{\"statusCodeExplanation\": \"Authentication is required. Please log in and try again.\", \"message\": \"%s\"}",
-                                    authException.getMessage());
-                            response.getWriter().write(jsonResponse);
-                            response.getWriter().flush();
-                        }));
+                        .authenticationEntryPoint(customAuthenticationEntryPoint));
         // costruisco e restituisco la catena di sicurezza
         return http.build();
     }

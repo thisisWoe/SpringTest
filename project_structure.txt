@@ -38,8 +38,11 @@
                                     └── jwt
                                             JwtAuthenticationFilter.java
                                             JwtTokenProvider.java
+                                        RateLimitProperties.java
                                     └── logger
                                             RequestLoggingFilter.java
+                                        RateLimiterFilter.java
+                                        CustomAuthenticationEntryPoint.java
                                         SecurityUser.java
                                         GithubUserInfo.java
                                         GoogleUserInfo.java
@@ -61,8 +64,10 @@
                                             SignInRequest.java
                                             SignInResponse.java
                                     └── edit_user
+                                            ChangePasswordRequest.java
                                             EditUserResponse.java
                                             EditUserRequest.java
+                                            InsertMailRequest.java
                                     └── sign_up
                                             SignUpRequest.java
                                             SignUpResponse.java
@@ -83,6 +88,8 @@
                                     └── superadmin
                                             SuperAdminProperties.java
                                         User.java
+                                └── value_object
+                                        EmailValueObject.java
                             └── services
                                     UserService.java
                                     ProviderService.java

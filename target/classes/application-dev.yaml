@@ -56,3 +56,7 @@ app:
 jwt:
   secret: "UXVlc3RhIMOoIGxhIG1pYSBzZWNyZXQgc3VwZXIgc2VncmV0YSBlIGRldmUgYW5jaGUgZXNzZXJlIHN1cGVyIGx1bmdh"
   token-expiration-millis: 86400000 # 1 day
+rate:
+  limit:
+    requests: 20
+    durationMinutes: 1

@@ -1,14 +1,16 @@
 package com.ecommercetest.test.controllers;
 
+import com.ecommercetest.test.controllers.dto.edit_user.ChangePasswordRequest;
 import com.ecommercetest.test.controllers.dto.edit_user.EditUserRequest;
 import com.ecommercetest.test.controllers.dto.edit_user.EditUserResponse;
+import com.ecommercetest.test.controllers.dto.edit_user.InsertMailRequest;
 import com.ecommercetest.test.controllers.dto.sign_in.SignInRequest;
 import com.ecommercetest.test.controllers.dto.sign_in.SignInResponse;
 import com.ecommercetest.test.controllers.dto.sign_up.SignUpRequest;
 import com.ecommercetest.test.controllers.dto.sign_up.SignUpResponse;
 import com.ecommercetest.test.controllers.response.ApiResponse;
+import com.ecommercetest.test.domain.value_object.EmailValueObject;
 import com.ecommercetest.test.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,8 +22,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("auth/signup")
     public ResponseEntity<ApiResponse> signUp(@RequestBody SignUpRequest request) {
@@ -61,6 +66,20 @@ public class UserController {
     public ResponseEntity<ApiResponse> editUser(@RequestBody EditUserRequest request) {
         request.validate();
         EditUserResponse response = userService.editUser(request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping("users/insert-email/{id}")
+    public ResponseEntity<ApiResponse> insertEmail(@PathVariable Long id, @RequestBody InsertMailRequest dto) {
+        EmailValueObject emailObj = new EmailValueObject(dto.getEmail());
+        EditUserResponse response = userService.insertEmail(emailObj, id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PutMapping("users/change-password/{id}")
+    public ResponseEntity<ApiResponse> changePassword(@PathVariable Long id, @RequestBody ChangePasswordRequest request) {
+        request.validate();
+        EditUserResponse response = userService.changePassword(request, id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

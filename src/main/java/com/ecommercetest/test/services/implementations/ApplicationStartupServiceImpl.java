@@ -16,14 +16,20 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 @Service
 public class ApplicationStartupServiceImpl implements ApplicationStartupService {
-    @Autowired
+    final
     ProviderService providerService;
 
-    @Autowired
+    final
     RoleService roleService;
 
-    @Autowired
+    final
     UserService userService;
+
+    public ApplicationStartupServiceImpl(ProviderService providerService, RoleService roleService, UserService userService) {
+        this.providerService = providerService;
+        this.roleService = roleService;
+        this.userService = userService;
+    }
 
     @Override
     @Transactional

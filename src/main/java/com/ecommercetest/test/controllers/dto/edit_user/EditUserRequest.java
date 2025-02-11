@@ -21,7 +21,8 @@ public class EditUserRequest {
         }
 
         String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        if(!email.matches(emailRegex)){
+
+        if (!(email != null && email.matches(emailRegex))) {
             throw new IllegalArgumentException("Email must be a valid email address.");
         }
     }

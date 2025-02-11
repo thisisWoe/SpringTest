@@ -10,16 +10,19 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class RoleServiceImpl implements RoleService {
-    @Autowired
-    @Qualifier("adminRole")
-    private ObjectProvider<Role> adminRoleProvider;
+    private final ObjectProvider<Role> adminRoleProvider;
 
-    @Autowired
-    @Qualifier("userRole")
-    private ObjectProvider<Role> userRoleProvider;
+    private final ObjectProvider<Role> userRoleProvider;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
+
+    public RoleServiceImpl(@Qualifier("adminRole") ObjectProvider<Role> adminRoleProvider,
+                           @Qualifier("userRole") ObjectProvider<Role> userRoleProvider,
+                           RoleRepository roleRepository) {
+        this.adminRoleProvider = adminRoleProvider;
+        this.userRoleProvider = userRoleProvider;
+        this.roleRepository = roleRepository;
+    }
 
     @Override
     public void checkRolesPresentOrSave() {

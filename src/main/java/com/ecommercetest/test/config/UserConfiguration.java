@@ -17,21 +17,24 @@ import java.util.Set;
 @Configuration
 public class UserConfiguration {
 
-    @Autowired
-    @Qualifier("adminRole")
-    private ObjectProvider<Role> adminRoleProvider;
+    private final ObjectProvider<Role> adminRoleProvider;
 
-    @Autowired
-    @Qualifier("userRole")
-    private ObjectProvider<Role> userRoleProvider;
+    private final ObjectProvider<Role> userRoleProvider;
 
-    @Autowired
-    @Qualifier("passwordEncoder")
-    private ObjectProvider<PasswordEncoder> passwordEncoder;
+    private final ObjectProvider<PasswordEncoder> passwordEncoder;
 
     // Inietto la classe che mappa i valori "app.superadmin.*" dall'application-dev.yaml
-    @Autowired
-    private SuperAdminProperties superAdminProps;
+    private final SuperAdminProperties superAdminProps;
+
+    public UserConfiguration(@Qualifier("adminRole") ObjectProvider<Role> adminRoleProvider,
+                             @Qualifier("userRole") ObjectProvider<Role> userRoleProvider,
+                             @Qualifier("passwordEncoder") ObjectProvider<PasswordEncoder> passwordEncoder,
+                             SuperAdminProperties superAdminProps) {
+        this.adminRoleProvider = adminRoleProvider;
+        this.userRoleProvider = userRoleProvider;
+        this.passwordEncoder = passwordEncoder;
+        this.superAdminProps = superAdminProps;
+    }
 
     @Bean("superAdmin")
     @Scope("singleton")
@@ -43,7 +46,7 @@ public class UserConfiguration {
 
         Set<String> rolesFromProperties = superAdminProps.getRoles();
 
-        if(rolesFromProperties.isEmpty()){
+        if (rolesFromProperties.isEmpty()) {
             throw new IllegalArgumentException("Roles must not be empty");
         }
 
